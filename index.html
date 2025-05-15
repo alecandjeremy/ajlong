@@ -53,22 +53,27 @@
       }
     </style>
   </head>
-  <body class="bg-pink-50 text-gray-800">
+  <body class="text-gray-800">
     <!-- Header / Navigation -->
     <header class="bg-white shadow">
       <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-        <h1 class="text-3xl font-bold tracking-tight font-ballet">Alec and Jeremy</h1>
+        <h1 class="text-3xl font-bold tracking-tight font-ballet">A & J</h1>
         <!--nav class="space-x-4">
           <a href="index.html" class="hover:underline">Home</a>
           <a href="story.html" class="hover:underline">Our Story</a>
           <a href="details.html" class="hover:underline">Details</a>
           <a href="gallery.html" class="hover:underline">Gallery</a>
           <a href="rsvp.html" class="hover:underline">RSVP</a>
-        </nav-->
+        </nav -->>
       </div>
     </header>
 
-    <!-- Carousel Timeline Section >
+    <!-- Coming Soon Section -->
+    <section class="py-32 text-center">
+      <h2 class="text-5xl font-ballet text-gray-700">Coming Soon</h2>
+    </section>
+
+    <!-- Carousel Timeline Section>
     <section class="py-20 px-4">
       <h2 class="text-4xl font-extrabold mb-10 text-center">Our Journey</h2>
       <div class="carousel">
@@ -94,37 +99,39 @@
           <button class="carousel-button" id="nextBtn">&#10095;</button>
         </div>
       </div>
-    </section>
+    </section -->
 
     <!-- Footer -->
     <footer class="bg-white border-t mt-10 py-4 text-center text-sm text-gray-500">
-      <p>&copy; 2025 Alec and Jeremy Long. All rights reserved.</p>
+      <p>&copy; 2025 A & J. All rights reserved.</p>
     </footer>
 
     <script>
-      const track = document.querySelector('.carousel-track');
-      const slides = Array.from(track.children);
-      const nextButton = document.getElementById('nextBtn');
-      const prevButton = document.getElementById('prevBtn');
-      let currentIndex = 0;
+      (() => {
+        const track = document.querySelector('.carousel-track');
+        const slides = Array.from(track.children);
+        const nextButton = document.getElementById('nextBtn');
+        const prevButton = document.getElementById('prevBtn');
+        let currentIndex = 0;
 
-      function updateCarousel() {
-        const slideWidth = slides[0].getBoundingClientRect().width;
-        track.style.transform = 'translateX(-' + (slideWidth * currentIndex) + 'px)';
-      }
+        function updateCarousel() {
+          const slideWidth = slides[0].getBoundingClientRect().width;
+          track.style.transform = 'translateX(-' + (slideWidth * currentIndex) + 'px)';
+        }
 
-      nextButton.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % slides.length;
-        updateCarousel();
-      });
+        nextButton.addEventListener('click', () => {
+          currentIndex = (currentIndex + 1) % slides.length;
+          updateCarousel();
+        });
 
-      prevButton.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-        updateCarousel();
-      });
+        prevButton.addEventListener('click', () => {
+          currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+          updateCarousel();
+        });
 
-      window.addEventListener('resize', updateCarousel);
-      window.addEventListener('load', updateCarousel);
+        window.addEventListener('resize', updateCarousel);
+        window.addEventListener('load', updateCarousel);
+      })();
     </script>
   </body>
 </html>
