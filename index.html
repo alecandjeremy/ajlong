@@ -17,6 +17,24 @@
       padding: 1rem 2rem;
       text-align: center;
     }
+    nav {
+      background-color: #444;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0.75rem 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      padding: 0.3rem 1rem;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+    nav a:hover {
+      background-color: #222;
+    }
     main {
       padding: 2rem;
     }
@@ -26,6 +44,12 @@
   <header>
     <h1>Alec & Jeremy</h1>
   </header>
+  <nav>
+    <a href="#life">Life</a>
+    <a href="#photos">Photos</a>
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+  </nav>
   <main>
     <p>Welcome to our site!</p>
     <p>We’ll be sharing more soon.</p>
