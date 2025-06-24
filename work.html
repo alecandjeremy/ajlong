@@ -44,15 +44,14 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>Alec & Jeremy</h1>
-  </header>
-  <nav>
-    <a href="#life">Life</a>
-    <a href="#photos">Photos</a>
-    <a href="#work" class="active">Work</a>
-    <a href="#contact">Contact</a>
-  </nav>
+<div id="navbar"></div>
+<script>
+  fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar').innerHTML = data;
+    });
+</script>
   <main>
     <h2>Work</h2>
     <p>This is the Work page. You can highlight professional experience, projects, or anything else related to work here.</p>
