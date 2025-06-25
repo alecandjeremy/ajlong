@@ -25,8 +25,7 @@ try {
 
   const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
   const page = await browser.newPage();
-  await page.goto(resumeUrl, { waitUntil: 'networkidle0' });
-
+  await page.goto(resumeUrl, {waitUntil: 'networkidle0', timeout: 0  // ⬅️ disables the default 30s timeout});
   await fs.ensureDir(path.resolve(__dirname, 'dist'));
   const outputPath = path.resolve(__dirname, 'dist', 'resume.html');
   await fs.writeFile(outputPath, await page.content(), 'utf-8');
