@@ -22,14 +22,14 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: resume-scraper
+        working-directory: ${{ github.workspace }}/resume-scraper
 
       - name: Run scraper
-        run: node scrape.js ../${{ github.event.inputs.input_file }}
-        working-directory: resume-scraper
+        run: node scrape.js ${{ github.workspace }}/${{ github.event.inputs.input_file }}
+        working-directory: ${{ github.workspace }}/resume-scraper
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: resume-scraper/dist/JeremyLongResume
+          publish_dir: ${{ github.workspace }}/resume-scraper/dist/JeremyLongResume
