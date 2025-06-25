@@ -23,13 +23,21 @@ jobs:
         with:
           node-version: 20
 
-      - name: Clean install latest deps
+      - name: Clean install latest dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install
 
-      - name: Run scraper
-        run: node scrape.js ../JeremyLongResume.html
+      - name: Run scraper (with 1 retry if it fails)
+        run: |
+          echo "🚀 Starting resume scraper..."
+          node scrape.js ../JeremyLongResume.html || (
+            echo "⚠️ First attempt failed. Retrying in 5s..." &&
+            sleep 5 &&
+            node scrape.js ../JeremyLongResume.html || (
+              echo "❌ Retry failed. Exiting." && exit 1
+            )
+          )
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
