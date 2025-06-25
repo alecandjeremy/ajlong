@@ -4,8 +4,16 @@ const axios = require("axios");
 const path = require("path");
 const { JSDOM } = require("jsdom");
 
-const OUTPUT_DIR = path.join(__dirname, "dist");
-const config = require("./resume.config.json"); const RESUME_URL = config.url;
+// 🔹 Get file name from CLI argument
+const inputFile = process.argv[2];
+if (!inputFile) {
+  console.error("❌ Please provide a file like 'jeremylongresume.html'");
+  process.exit(1);
+}
+
+const inputPath = path.join(__dirname, inputFile);
+const baseName = path.basename(inputFile, ".html");
+const OUTPUT_DIR = path.join(__dirname, "dist", baseName);
 
 async function download(url, filepath) {
   const res = await axios.get(url, { responseType: "arraybuffer" });
@@ -13,26 +21,35 @@ async function download(url, filepath) {
 }
 
 async function scrapeResume() {
+  const htmlContent = await fs.readFile(inputPath, "utf-8");
+  const dom = new JSDOM(htmlContent);
+  const meta = dom.window.document.querySelector('meta[name="resume-url"]');
+
+  if (!meta || !meta.content) {
+    throw new Error(`❌ No <meta name="resume-url"> found in ${inputFile}`);
+  }
+
+  const RESUME_URL = meta.content;
+  console.log(`🔗 Scraping resume from: ${RESUME_URL}`);
+
   const browser = await puppeteer.launch({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
-
   await page.goto(RESUME_URL, { waitUntil: "networkidle0" });
 
   const html = await page.content();
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+  const resumeDom = new JSDOM(html);
+  const resumeNode = resumeDom.window.document.querySelector(".resume-renderer");
 
-  const resumeNode = document.querySelector(".resume-renderer");
-  if (!resumeNode) throw new Error("Resume container not found.");
+  if (!resumeNode) throw new Error("❌ Resume container not found.");
 
   const localHTML = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Jeremy Long Resume</title>
+  <title>${baseName} Resume</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -43,24 +60,20 @@ ${resumeNode.outerHTML}
   await fs.ensureDir(OUTPUT_DIR);
   await fs.writeFile(path.join(OUTPUT_DIR, "index.html"), localHTML);
 
-  console.log("✅ HTML created. Pulling stylesheets…");
-
-  const styles = Array.from(document.querySelectorAll("link[rel=stylesheet]"))
+  const styles = Array.from(resumeDom.window.document.querySelectorAll("link[rel=stylesheet]"))
     .map(link => link.href)
     .filter(href => href.startsWith("http"));
 
   for (const [i, url] of styles.entries()) {
     const filename = `style-${i}.css`;
-    const filepath = path.join(OUTPUT_DIR, "assets", filename);
-    await download(url, filepath);
-    console.log(`⬇️  ${url} → ${filename}`);
+    await download(url, path.join(OUTPUT_DIR, "assets", filename));
   }
 
   await browser.close();
-  console.log("🎉 Done! Files saved to dist/");
+  console.log(`🎉 Scraped resume saved to /dist/${baseName}`);
 }
 
 scrapeResume().catch(err => {
-  console.error("❌ Error scraping resume:", err);
+  console.error(err);
   process.exit(1);
 });
