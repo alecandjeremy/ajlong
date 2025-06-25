@@ -23,7 +23,7 @@ try {
   const resumeUrl = match[0];
   console.log(`🌐 Scraping from: ${resumeUrl}`);
 
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
   const page = await browser.newPage();
   await page.goto(resumeUrl, { waitUntil: 'networkidle0' });
 
