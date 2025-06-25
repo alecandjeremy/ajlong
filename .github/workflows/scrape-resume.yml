@@ -1,15 +1,20 @@
 name: Scrape Enhancv Resume
 
 on:
-  workflow_dispatch:  # allows manual trigger
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: "HTML file with <meta name='resume-url'>"
+        required: true
+        default: "JeremyLongResume.htm"
   schedule:
-    - cron: '0 5 * * *'  # runs daily at 5am UTC
+    - cron: '0 5 * * *'  # daily at 5am UTC
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -21,12 +26,13 @@ jobs:
         working-directory: resume-scraper
         run: npm install
 
-      - name: Run scraper
+      - name: Scrape Enhancv resume
         working-directory: resume-scraper
-        run: npm start
+        run: |
+          node scrape.js ../${{ github.event.inputs.input_file || 'JeremyLongResume.htm' }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: resume-scraper/dist
+          publish_dir: resume-scraper/dist/JeremyLongResume
