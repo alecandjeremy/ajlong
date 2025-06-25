@@ -1,1 +1,32 @@
+name: Scrape Enhancv Resume
 
+on:
+  workflow_dispatch:  # allows manual trigger
+  schedule:
+    - cron: '0 5 * * *'  # runs daily at 5am UTC
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: resume-scraper
+        run: npm install
+
+      - name: Run scraper
+        working-directory: resume-scraper
+        run: npm start
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: resume-scraper/dist
