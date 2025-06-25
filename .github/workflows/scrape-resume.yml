@@ -1,16 +1,15 @@
 name: Scrape Enhancv Resume
 
 on:
-  workflow_dispatch:
-    inputs:
-      input_file:
-        description: "HTML file with <meta name='resume-url'>"
-        required: true
-        default: "JeremyLongResume.html"
+  workflow_dispatch: # allows manual runs
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./resume-scraper
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -22,14 +21,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: .github/workflows/resume-scraper
 
       - name: Run scraper
-        run: node scrape.js ../../../${{ github.event.inputs.input_file }}
-        working-directory: .github/workflows/resume-scraper
+        run: node scrape.js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .github/workflows/resume-scraper/dist/JeremyLongResume
+          publish_dir: ./resume-scraper/out
+
