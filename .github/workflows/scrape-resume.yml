@@ -2,13 +2,17 @@ name: Scrape Enhancv Resume
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'JeremyLongResume.html'
+      - 'resume-scraper/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: .github/workflows/resume-scraper
+        working-directory: resume-scraper
 
     steps:
       - name: Checkout repo
@@ -19,18 +23,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install latest dependencies
+      - name: Clean install latest deps
         run: |
-          npm install puppeteer@latest
-          npm install fs-extra@latest
-          npm install axios@latest
-          npm install jsdom@latest
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Run scraper
-        run: node scrape.js JeremyLongResume.html
+        run: node scrape.js ../JeremyLongResume.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .github/workflows/resume-scraper/dist
+          publish_dir: resume-scraper/dist
