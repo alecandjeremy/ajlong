@@ -6,6 +6,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .github/workflows/resume-scraper
 
     steps:
       - name: Checkout repo
@@ -16,16 +19,18 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        working-directory: .github/workflows/resume-scraper
-        run: npm install
+      - name: Install latest dependencies
+        run: |
+          npm install puppeteer@latest
+          npm install fs-extra@latest
+          npm install axios@latest
+          npm install jsdom@latest
 
       - name: Run scraper
-        working-directory: .github/workflows/resume-scraper
         run: node scrape.js JeremyLongResume.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .github/workflows/resume-scraper/dist/JeremyLongResume
+          publish_dir: .github/workflows/resume-scraper/dist
