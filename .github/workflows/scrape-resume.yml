@@ -1,11 +1,12 @@
 name: Scrape Enhancv Resume
 
 on:
-  workflow_dispatch: # allows manual runs
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: ./resume-scraper
@@ -29,5 +30,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./resume-scraper/out
-
+          publish_dir: ./resume-scraper/output
