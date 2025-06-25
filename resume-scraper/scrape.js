@@ -1,80 +1,39 @@
-const puppeteer = require("puppeteer");
-const fs = require("fs-extra");
-const axios = require("axios");
-const path = require("path");
-const { JSDOM } = require("jsdom");
+import puppeteer from 'puppeteer';
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// 🔹 Get file name from CLI argument
+// Resolve __dirname in ES module context
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get the input file from command line
 const inputFile = process.argv[2];
-if (!inputFile) {
-  console.error("❌ Please provide a file like 'jeremylongresume.html'");
-  process.exit(1);
-}
 
-const inputPath = path.join(__dirname, inputFile);
-const baseName = path.basename(inputFile, ".html");
-const OUTPUT_DIR = path.join(__dirname, "dist", baseName);
+try {
+  if (!inputFile) throw new Error("❌ No input HTML file provided.");
 
-async function download(url, filepath) {
-  const res = await axios.get(url, { responseType: "arraybuffer" });
-  await fs.outputFile(filepath, res.data);
-}
+  const htmlPath = path.resolve(__dirname, inputFile);
+  const htmlContent = await fs.readFile(htmlPath, 'utf-8');
 
-async function scrapeResume() {
-  const htmlContent = await fs.readFile(inputPath, "utf-8");
-  const dom = new JSDOM(htmlContent);
-  const meta = dom.window.document.querySelector('meta[name="resume-url"]');
+  // Extract Enhancv URL from HTML content
+  const match = htmlContent.match(/https:\/\/app\.enhancv\.com\/share\/[a-zA-Z0-9]+/);
+  if (!match) throw new Error("❌ No Enhancv URL found in HTML.");
 
-  if (!meta || !meta.content) {
-    throw new Error(`❌ No <meta name="resume-url"> found in ${inputFile}`);
-  }
+  const resumeUrl = match[0];
+  console.log(`🌐 Scraping from: ${resumeUrl}`);
 
-  const RESUME_URL = meta.content;
-  console.log(`🔗 Scraping resume from: ${RESUME_URL}`);
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto(RESUME_URL, { waitUntil: "networkidle0" });
+  await page.goto(resumeUrl, { waitUntil: 'networkidle0' });
 
-  const html = await page.content();
-  const resumeDom = new JSDOM(html);
-  const resumeNode = resumeDom.window.document.querySelector(".resume-renderer");
+  await fs.ensureDir(path.resolve(__dirname, 'dist'));
+  const outputPath = path.resolve(__dirname, 'dist', 'resume.html');
+  await fs.writeFile(outputPath, await page.content(), 'utf-8');
 
-  if (!resumeNode) throw new Error("❌ Resume container not found.");
-
-  const localHTML = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>${baseName} Resume</title>
-  <link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-${resumeNode.outerHTML}
-</body>
-</html>`;
-
-  await fs.ensureDir(OUTPUT_DIR);
-  await fs.writeFile(path.join(OUTPUT_DIR, "index.html"), localHTML);
-
-  const styles = Array.from(resumeDom.window.document.querySelectorAll("link[rel=stylesheet]"))
-    .map(link => link.href)
-    .filter(href => href.startsWith("http"));
-
-  for (const [i, url] of styles.entries()) {
-    const filename = `style-${i}.css`;
-    await download(url, path.join(OUTPUT_DIR, "assets", filename));
-  }
-
+  console.log(`✅ Resume saved to: ${outputPath}`);
   await browser.close();
-  console.log(`🎉 Scraped resume saved to /dist/${baseName}`);
-}
-
-scrapeResume().catch(err => {
-  console.error(err);
+} catch (err) {
+  console.error("❌ Scraper failed:", err.message);
   process.exit(1);
-});
-
+}
