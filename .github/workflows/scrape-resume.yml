@@ -8,7 +8,7 @@ on:
       - 'resume-scraper/**'
 
 jobs:
-  build:
+  scrape-and-commit:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -38,19 +38,11 @@ jobs:
               echo "❌ Retry failed. Exiting." && exit 1
             )
           )
-          
-      - name: Move output files to main root
+
+      - name: Commit updated resume
         run: |
-          mv dist/resume.html ../JeremyLongResume.html
-          mv dist/debug-screenshot.png ../debug-screenshot.png
-
-#      - name: Create CNAME for subdomain if it doesn't exist
-#        run: |
-#          mkdir -p resume-scraper/dist
-#          [ -f resume-scraper/dist/CNAME ] || echo "jeremylongresume.alecandjeremy.com" > resume-scraper/dist/CNAME
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: resume-scraper/dist
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ../JeremyLongResume.html
+          git commit -m "Update resume from Enhancv" || echo "No changes to commit"
+          git push
