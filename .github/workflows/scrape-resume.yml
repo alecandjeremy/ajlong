@@ -31,7 +31,7 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --force
 
-      - name: 🚀 Run scraper with retry
+      - name: Run scraper (with 1 retry if it fails)
         run: |
           echo "🚀 Starting resume scraper..."
           node scrape.js ../JeremyLongResume.html || (
@@ -43,9 +43,11 @@ jobs:
           )
 
       - name: Create CNAME for subdomain
-        run: echo "jeremylongresume.alecandjeremy.com" > resume-scraper/dist/CNAME
+        run: |
+          mkdir -p resume-scraper/dist
+          echo "jeremylongresume.alecandjeremy.com" > resume-scraper/dist/CNAME
 
-      - name: 📦 Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
