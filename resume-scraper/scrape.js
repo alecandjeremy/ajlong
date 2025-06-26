@@ -40,11 +40,7 @@ const __dirname = path.dirname(__filename);
     const outputPath = path.join(distDir, 'JeremyLongResume.html');
     await fs.writeFile(outputPath, await page.content(), 'utf-8');
 
-    const screenshotPath = path.join(distDir, 'debug-screenshot.png');
-    await page.screenshot({ path: screenshotPath, fullPage: true });
-
     console.log(`✅ Resume saved to: ${outputPath}`);
-    console.log(`🖼️  Screenshot saved to: ${screenshotPath}`);
 
     await browser.close();
   } catch (err) {
