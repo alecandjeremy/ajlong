@@ -38,6 +38,11 @@ jobs:
               echo "❌ Retry failed. Exiting." && exit 1
             )
           )
+          
+      - name: Move output files to main root
+        run: |
+          mv dist/resume.html ../JeremyLongResume.html
+          mv dist/debug-screenshot.png ../debug-screenshot.png
 
 #      - name: Create CNAME for subdomain if it doesn't exist
 #        run: |
