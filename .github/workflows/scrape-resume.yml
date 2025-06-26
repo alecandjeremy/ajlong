@@ -42,10 +42,10 @@ jobs:
             )
           )
 
-      - name: Create CNAME for subdomain if it doesn't exist
-        run: |
-          mkdir -p resume-scraper/dist
-          [ -f resume-scraper/dist/CNAME ] || echo "jeremylongresume.alecandjeremy.com" > resume-scraper/dist/CNAME
+#      - name: Create CNAME for subdomain if it doesn't exist
+#        run: |
+#          mkdir -p resume-scraper/dist
+#          [ -f resume-scraper/dist/CNAME ] || echo "jeremylongresume.alecandjeremy.com" > resume-scraper/dist/CNAME
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
