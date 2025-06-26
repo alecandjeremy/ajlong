@@ -7,9 +7,6 @@ on:
       - 'JeremyLongResume.html'
       - 'resume-scraper/**'
 
-permissions:
-  contents: write  # ✅ Needed for gh-pages push
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,18 +15,18 @@ jobs:
         working-directory: resume-scraper
 
     steps:
-      - name: 📥 Checkout repo
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: 🧹 Clean install latest dependencies
+      - name: Clean install latest dependencies
         run: |
           rm -rf node_modules package-lock.json
-          npm install --force
+          npm install
 
       - name: Run scraper (with 1 retry if it fails)
         run: |
