@@ -1,4 +1,4 @@
-// scrape.js (ES Module)
+// scrape.js (ES Module with PDF + HTML output)
 import puppeteer from 'puppeteer';
 import fs from 'fs-extra';
 import path from 'path';
@@ -14,8 +14,8 @@ const url = await fs.readFile(htmlFile, 'utf-8');
 console.log(`🌍 Scraping from: ${url.trim()}`);
 
 const browser = await puppeteer.launch({
-  args: ['--no-sandbox'],
-  headless: 'new'
+  headless: true,
+  args: ['--no-sandbox']
 });
 
 try {
@@ -23,18 +23,48 @@ try {
   console.log('📥 Navigating to Enhancv URL...');
   await page.goto(url.trim(), { waitUntil: 'networkidle2', timeout: 60000 });
 
-  // Wait for resume container to render
-  await page.waitForSelector('[id^="resume-"]', { timeout: 45000 });
-  await page.waitForTimeout(10000); // Additional wait to ensure rendering
-  console.log('✅ Resume container detected, capturing HTML...');
+  // Wait for the download button and click it
+  const downloadBtnSelector = 'button[aria-label="Download"]';
+  await page.waitForSelector(downloadBtnSelector, { timeout: 20000 });
+  console.log('📄 Download button found, clicking...');
+  const downloadPath = path.resolve(__dirname, '..');
+  await page._client.send('Page.setDownloadBehavior', {
+    behavior: 'allow',
+    downloadPath
+  });
+  await page.click(downloadBtnSelector);
 
-  // Get only the outer HTML of the resume container
-  const resumeHtml = await page.$eval('[id^="resume-"]', el => el.outerHTML);
+  // Wait for download to complete (approximate wait)
+  await page.waitForTimeout(10000);
 
-  const distDir = path.resolve(__dirname, '..');
-  await fs.ensureDir(distDir);
-  await fs.writeFile(path.join(distDir, 'JeremyLongResume.html'), resumeHtml, 'utf-8');
-  console.log('✅ Resume saved to: JeremyLongResume.html');
+  // Rename downloaded file (assumes only PDF was downloaded)
+  const files = await fs.readdir(downloadPath);
+  const downloadedPdf = files.find(f => f.endsWith('.pdf'));
+  const finalPdfPath = path.join(downloadPath, 'JeremyLongResume.pdf');
+  if (downloadedPdf) {
+    await fs.move(path.join(downloadPath, downloadedPdf), finalPdfPath, { overwrite: true });
+    console.log(`✅ PDF saved as: ${finalPdfPath}`);
+  } else {
+    throw new Error('❌ PDF file not found after download.');
+  }
+
+  // Create an HTML wrapper to embed the PDF and trigger download
+  const outputHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeremy Long Resume</title>
+</head>
+<body style="margin:0; display:flex; flex-direction:column; align-items:center;">
+  <h1>Jeremy Long Resume</h1>
+  <p><a href="JeremyLongResume.pdf" download>📎 Download PDF</a></p>
+  <iframe src="JeremyLongResume.pdf" width="100%" height="800px" style="border:none;"></iframe>
+</body>
+</html>`;
+
+  await fs.writeFile(path.join(downloadPath, 'JeremyLongResume.html'), outputHtml, 'utf-8');
+  console.log('✅ Resume HTML generated with PDF embedded');
+
 } catch (err) {
   console.error('❌ Scraper failed:', err);
   process.exit(1);
