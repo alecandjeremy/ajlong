@@ -6,9 +6,8 @@
     "start": "node scrape.js"
   },
   "dependencies": {
-    "axios": "latest",
-    "fs-extra": "latest",
-    "jsdom": "latest",
-    "puppeteer": "latest"
+    "axios": "*",
+    "jsdom": "*",
+    "puppeteer": "*"
   }
 }
