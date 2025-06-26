@@ -9,5 +9,7 @@
     "axios": "*",
     "jsdom": "*",
     "puppeteer": "*"
+    "fs-extra": "*"
+
   }
 }
