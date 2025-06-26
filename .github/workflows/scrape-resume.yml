@@ -15,20 +15,20 @@ jobs:
         working-directory: resume-scraper
 
     steps:
-      - name: Checkout repo
+      - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Clean install latest dependencies
+      - name: 🧹 Clean install latest dependencies
         run: |
           rm -rf node_modules package-lock.json
-          npm install
+          npm install --force
 
-      - name: Run scraper (with 1 retry if it fails)
+      - name: 🚀 Run scraper with retry
         run: |
           echo "🚀 Starting resume scraper..."
           node scrape.js ../JeremyLongResume.html || (
@@ -39,7 +39,7 @@ jobs:
             )
           )
 
-      - name: Deploy to GitHub Pages
+      - name: 📦 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
