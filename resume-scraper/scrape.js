@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 👇 All logic inside an async IIFE
 (async () => {
   const inputFile = process.argv[2];
 
@@ -30,16 +29,23 @@ const __dirname = path.dirname(__filename);
 
     console.log("📥 Navigating to Enhancv URL...");
     await page.goto(resumeUrl, {
-      waitUntil: 'networkidle0',
-      timeout: 0
+      waitUntil: 'networkidle2', // looser than networkidle0
+      timeout: 60000             // 60 seconds max wait
     });
+    console.log("✅ Page loaded, capturing HTML...");
 
-    console.log("✅ Navigation complete. Saving HTML...");
-    await fs.ensureDir(path.resolve(__dirname, 'dist'));
-    const outputPath = path.resolve(__dirname, 'dist', 'resume.html');
+    const distDir = path.resolve(__dirname, 'dist');
+    await fs.ensureDir(distDir);
+
+    const outputPath = path.join(distDir, 'resume.html');
     await fs.writeFile(outputPath, await page.content(), 'utf-8');
 
+    const screenshotPath = path.join(distDir, 'debug-screenshot.png');
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+
     console.log(`✅ Resume saved to: ${outputPath}`);
+    console.log(`🖼️  Screenshot saved to: ${screenshotPath}`);
+
     await browser.close();
   } catch (err) {
     console.error("❌ Scraper failed:", err.message);
