@@ -42,6 +42,9 @@ jobs:
             )
           )
 
+      - name: Create CNAME for subdomain
+        run: echo "jeremylongresume.alecandjeremy.com" > resume-scraper/dist/CNAME
+
       - name: 📦 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
