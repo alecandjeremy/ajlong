@@ -37,7 +37,7 @@ const __dirname = path.dirname(__filename);
     const distDir = path.resolve(__dirname, 'dist');
     await fs.ensureDir(distDir);
 
-    const outputPath = path.join(distDir, 'resume.html');
+    const outputPath = path.join(distDir, 'JeremyLongResume.html');
     await fs.writeFile(outputPath, await page.content(), 'utf-8');
 
     const screenshotPath = path.join(distDir, 'debug-screenshot.png');
