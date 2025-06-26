@@ -7,9 +7,8 @@
   },
   "dependencies": {
     "axios": "*",
+    "fs-extra": "*",
     "jsdom": "*",
     "puppeteer": "*"
-    "fs-extra": "*"
-
   }
 }
