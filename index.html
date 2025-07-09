@@ -1,12 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Iframe Example</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .iframe-container {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      top: 0; left: 0;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="iframe-container">
+    <iframe id="responsive-iframe" loading="lazy" allowfullscreen></iframe>
+  </div>
+  <script>
+    // URLs for desktop and mobile
+    const desktopSrc = "https://www.canva.com/design/DAGsozMUuOc/pVBVRBSwvfr8NnvjSgRLHA/view?embed";
+    const mobileSrc = "https://www.canva.com/design/DAGso-LBvOc/QhS4e6gIBxnK2-I4-7N2IQ/view?embed;
+      
+    function setIframeSrc() {
+      const iframe = document.getElementById('responsive-iframe');
+      if(window.innerWidth <= 600) {
+        iframe.src = mobileSrc;
+      } else {
+        iframe.src = desktopSrc;
+      }
+    }
 
-<div>
-  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="https://www.canva.com/design/DAGsozMUuOc/pVBVRBSwvfr8NnvjSgRLHA/view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-  </iframe>
-</div>
-
+    // Set on load and on resize
+    window.addEventListener('DOMContentLoaded', setIframeSrc);
+    window.addEventListener('resize', setIframeSrc);
+  </script>
+</body>
 </html>
-
-
